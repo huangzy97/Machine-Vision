@@ -44,13 +44,6 @@ def pre_work_del_old_face_folders():
         shutil.rmtree(path_photos_from_camera+folders_rd[i])
     if os.path.isfile("data/features_all.csv"):
         os.remove("data/features_all.csv")
-# 这里在每次程序录入之前, 删掉之前存的人脸数据
-# 如果这里打开，每次进行人脸录入的时候都会删掉之前的人脸图像文件夹 person_1/,person_2/,person_3/...
-# If enable this function, it will delete all the old data in dir person_1/,person_2/,/person_3/...
-# pre_work_del_old_face_folders()
-##################################
-# 如果有之前录入的人脸 / if the old folders exists
-# 在之前 person_x 的序号按照 person_x+1 开始录入 / start from person_x+1
 if os.listdir("data/data_faces_from_camera/"):
     # 获取已录入的最后一个人脸序号 / get the num of latest person
     person_list = os.listdir("data/data_faces_from_camera/")
@@ -68,8 +61,6 @@ save_flag = 1
 press_n_flag = 0
 while cap.isOpened():
     flag, img_rd = cap.read()
-    # print(img_rd.shape)
-    # It should be 480 height * 640 width
     kk = cv2.waitKey(1)
     img_gray = cv2.cvtColor(img_rd, cv2.COLOR_RGB2GRAY)    
     # 人脸数 faces
@@ -79,12 +70,12 @@ while cap.isOpened():
     # 按下 'n' 新建存储人脸的文件夹 / press 'n' to create the folders for saving faces
     if kk == ord('n'):
         person_cnt += 1
-        name = input("Enter your name: ")
+        name = input("Enter your name: ")##支持中文人名文件夹名称的手工录入
         person_list = os.listdir("data/data_faces_from_camera/")
         person_name = []
         for person in person_list:
             person_name.append(str(person.split('_')[0]))
-        if name in person_name:
+        if name in person_name:###判断录入人的照片是否存在，如果已经录入无需重新录入
             print ("用户照片已存在,无需重复录入!!！")
             print("请重新键盘输入'N'来新建人脸文件夹！")
             person_cnt -= 1
@@ -138,9 +129,8 @@ while cap.isOpened():
                         for ii in range(height*2):
                             for jj in range(width*2):
                                 im_blank[ii][jj] = img_rd[d.top()-hh + ii][d.left()-ww + jj]
-                        #cv2.imwrite(current_face_dir + "/img_face_" + str(cnt_ss) + ".jpg", im_blank)
-                        #cv2.imwrite("我//h.jpg", frame) #该方法不成功
-                        cv2.imencode('.jpg', im_blank)[1].tofile(current_face_dir + "/" + name +'_'+ str(cnt_ss)+ ".jpg") #正确方法
+                        #cv2.imwrite(current_face_dir + "/img_face_" + str(cnt_ss) + ".jpg", im_blank)##原方法
+                        cv2.imencode('.jpg', im_blank)[1].tofile(current_face_dir + "/" + name +'_'+ str(cnt_ss)+ ".jpg") #中文名称照片保存
                         
                         print("保存照片：", str(current_face_dir) + "/" + name +'_' + str(cnt_ss) + ".jpg")
                     else:
